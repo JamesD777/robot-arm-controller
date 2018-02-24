@@ -6,6 +6,6 @@
 static int rotate(int deg);
 static double getArmAngle(double x, double y);
 static double getExtensionAngle(double x, double y);
-static boolean step(boolean dir, byte dirPin, byte stepPin, int steps, int pulseWidth);
+static void step(boolean dir, byte dirPin, byte stepPin, int steps, int pulseWidth);
 
 #endif

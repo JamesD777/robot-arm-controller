@@ -1,6 +1,4 @@
 // Installed libraries
-#include <Thread.h>
-#include <StaticThreadController.h>
 #include <ArduinoHttpClient.h>
 
 // Arm functions include
@@ -14,14 +12,14 @@
 #define EN 5
 
 // Define direction pins
-#define ARM_DIR 6
+#define ARM_DIR 3
 #define EXTENSION_DIR 8
-#define CLAW_DIR 3
+#define CLAW_DIR 6
 
 // Define step pins
-#define ARM_STEP 7
+#define ARM_STEP 4
 #define EXTENSION_STEP 9
-#define CLAW_STEP 4
+#define CLAW_STEP 7
 
 // Global ethernet variables
 byte mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};
@@ -29,38 +27,16 @@ char server[] = "echo.websocket.org";
 int port = 80;
 
 // Global position variables
+int armSteps = 0;
+int extensionSteps = 0;
 double posX, posY = 0;
 double lastX, lastY = 0;
-
-// Threads for controlling arm motors
-Thread *armThread = new Thread();
-Thread *extensionThread = new Thread();
-Thread *clawThread = new Thread();
-
-// Websocket thread
-Thread *socketThread = new Thread();
-
-// Thread controller
-StaticThreadController<4> controller(armThread, extensionThread, clawThread, socketThread);
 
 // Websocket client
 EthernetClient ethernet;
 WebSocketClient client = WebSocketClient(ethernet, server, port);
 
-void armCallback()
-{
-}
-
-void extensionCallback()
-{
-}
-
-void clawCallback()
-{
-  // TODO
-}
-
-void socketCallback()
+void readSocket()
 {
   if (client.connected())
   {
@@ -72,8 +48,28 @@ void socketCallback()
       Serial.println("Received a message:");
       Serial.println(client.readString());
       
-      // Parse the message to get the new x and y positions
+      // Parse the message to set the new x and y positions
     }
+  }
+}
+
+void stepArm() {
+  if (armSteps < rotate(90)) {
+    step(true, ARM_DIR, ARM_STEP, 100);
+    armSteps++;
+  } else {
+    delay(100);
+    armSteps = 0;
+  }
+}
+
+void stepExtension() {
+  if (extensionSteps < rotate(90)) {
+    step(true, EXTENSION_DIR, EXTENSION_STEP, 100);
+    extensionSteps++;
+  } else {
+    delay(100);
+    extensionSteps = 0;
   }
 }
 
@@ -101,28 +97,15 @@ void setup()
   pinMode(EN, OUTPUT);
   digitalWrite(EN, HIGH);
 
-  const int INTERVAL = 20;
-
-  // Configure threads
-  armThread->onRun(armCallback);
-  armThread->setInterval(INTERVAL);
-
-  extensionThread->onRun(extensionCallback);
-  extensionThread->setInterval(INTERVAL);
-
-  clawThread->onRun(clawCallback);
-  clawThread->setInterval(INTERVAL);
-
-  socketThread->onRun(socketCallback);
-  socketThread->setInterval(INTERVAL);
-
   // Start websocket client
-  client.begin();
+  // client.begin();
 }
 
 void loop()
 {
-  controller.run();
+  //readSocket();
+  stepArm();
+  stepExtension();
 
   lastX = posX;
   lastY = posY;

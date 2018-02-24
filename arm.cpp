@@ -42,14 +42,11 @@ static double getExtensionAngle(double x, double y)
  * dir: true -> step right, false -> step left
  * @param pulseWidth: Time (us) between high/low write
  */
-static boolean step(boolean dir, byte dirPin, byte stepPin, int steps, int pulseWidth)
+static void step(boolean dir, byte dirPin, byte stepPin, int pulseWidth)
 {
   digitalWrite(dirPin, dir);
-  for (int i = 0; i < steps; i++)
-  {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(pulseWidth);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(pulseWidth);
-  }
+  digitalWrite(stepPin, HIGH);
+  delayMicroseconds(pulseWidth);
+  digitalWrite(stepPin, LOW);
+  delayMicroseconds(pulseWidth);
 }
