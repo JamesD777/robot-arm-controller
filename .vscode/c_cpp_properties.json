@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/jacob/.arduino-1.8.5/hardware/arduino/avr/cores/arduino",
+                "/home/jacob/Arduino/libraries/ArduinoHttpClient/src"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "/home/jacob/.arduino-1.8.5/hardware/arduino/avr/cores/arduino",
+                    "/home/jacob/Arduino/libraries/ArduinoHttpClient/src"
+                ]
+            },
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 3
+}
