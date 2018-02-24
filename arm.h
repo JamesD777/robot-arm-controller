@@ -3,7 +3,8 @@
 
 #include "lib/math.h"
 
-static double rotate(double deg);
+static int s(double deg);
+static double stepsToDegrees(int steps);
 static double getArmAngle(double x, double y);
 static double getExtensionAngle(double x, double y);
 static void step(boolean dir, byte dirPin, byte stepPin, int steps, int pulseWidth);

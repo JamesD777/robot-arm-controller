@@ -5,15 +5,22 @@
 #define MICROSTEP_MODE 32
 
 // Arm lengths in meters
-#define ARM_LENGTH 0.3048
-#define ARM_EXTENSION_LENGTH 0.2032
+#define ARM_LENGTH 0.2794
+#define ARM_EXTENSION_LENGTH 0.2794
+
+const double ARM_GEAR_RATIO = 33.0 / 111.0;
+const double EXTENSION_GEAR_RATIO = 10.0 / 40.0;
 
 /**
  * Input degrees to move the stepper
  */
-static double rotate(double deg)
+static int degreesToSteps(double deg)
 {
-  return (deg / STEP_SIZE) * MICROSTEP_MODE;
+    return (deg / STEP_SIZE) * MICROSTEP_MODE;
+}
+
+static double stepsToDegrees(int steps) {
+  return (steps / MICROSTEP_MODE) * STEP_SIZE;
 }
 
 /**
@@ -22,7 +29,7 @@ static double rotate(double deg)
  */
 static double getArmAngle(double x, double y)
 {
-  return ARM_EXTENSION_LENGTH + atan2(y, x) * 180 / M_PI;
+  return (ARM_EXTENSION_LENGTH + atan2(y, x) * 180 / M_PI) * ARM_GEAR_RATIO;
 }
 
 /**
@@ -35,7 +42,7 @@ static double getExtensionAngle(double x, double y)
   double numerator = pow(ARM_LENGTH, 2) + pow(ARM_EXTENSION_LENGTH, 2) - pow(hypotenuse, 2);
   double denominator = 2 * ARM_LENGTH * ARM_EXTENSION_LENGTH;
 
-  return acos(numerator / denominator) * 180 / M_PI;
+  return (acos(numerator / denominator) * 180 / M_PI) * EXTENSION_GEAR_RATIO;
 }
 
 /**

@@ -29,12 +29,15 @@ int port = 80;
 // Global position variables
 int armSteps = 0;
 int extensionSteps = 0;
+int clawSteps = 0;
 
 double currentArmAngle = 0;
 double currentExtensionAngle = 0;
+double currentClawAngle = 0;
 
 double targetArmAngle = 0;
 double targetExtensionAngle = 0;
+double targetClawAngle = 90;
 
 double posX, posY = 0;
 double lastX, lastY = 0;
@@ -62,7 +65,7 @@ void readSocket()
 
 void stepArm(boolean dir, double deg)
 {
-  if (armSteps < rotate(deg))
+  if (armSteps < degreesToSteps(deg))
   {
     step(dir, ARM_DIR, ARM_STEP, 100);
     armSteps++;
@@ -71,10 +74,19 @@ void stepArm(boolean dir, double deg)
 
 void stepExtension(boolean dir, double deg)
 {
-  if (armSteps < rotate(deg))
+  if (armSteps < degreesToSteps(deg))
   {
     step(dir, EXTENSION_DIR, EXTENSION_STEP, 100);
     extensionSteps++;
+  }
+}
+
+void stepClaw(boolean dir, double deg)
+{
+  if (clawSteps < degreesToSteps(deg))
+  {
+    step(dir, CLAW_DIR, CLAW_STEP, 100);
+    clawSteps++;
   }
 }
 
@@ -130,16 +142,25 @@ void setup()
 void loop()
 {
   //readSocket();
-  if (currentArmAngle != targetArmAngle)
+  if (armSteps < degreesToSteps(targetArmAngle))
   {
     int dir = checkAngle(currentArmAngle, targetArmAngle);
     stepArm(dir, targetArmAngle);
+    // Serial.print("current: "); Serial.println(currentArmAngle);
+    // Serial.print("target: "); Serial.println(targetArmAngle);
+    currentArmAngle = stepsToDegrees(armSteps);
   }
 
-  if (currentExtensionAngle != targetExtensionAngle)
+  // if (currentExtensionAngle != targetExtensionAngle)
+  // {
+  //   int dir = checkAngle(currentExtensionAngle, targetExtensionAngle);
+  //   stepExtension(dir, targetExtensionAngle);
+  // }
+
+  if (clawSteps < degreesToSteps(targetClawAngle))
   {
-    int dir = checkAngle(currentExtensionAngle, targetExtensionAngle);
-    stepExtension(dir, targetExtensionAngle);
+    int dir = checkAngle(currentClawAngle, targetClawAngle);
+    stepClaw(dir, targetClawAngle);
   }
 
   lastX = posX;
