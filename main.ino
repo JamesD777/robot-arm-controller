@@ -29,6 +29,13 @@ int port = 80;
 // Global position variables
 int armSteps = 0;
 int extensionSteps = 0;
+
+double currentArmAngle = 0;
+double currentExtensionAngle = 0;
+
+double targetArmAngle = 0;
+double targetExtensionAngle = 0;
+
 double posX, posY = 0;
 double lastX, lastY = 0;
 
@@ -47,29 +54,48 @@ void readSocket()
     {
       Serial.println("Received a message:");
       Serial.println(client.readString());
-      
+
       // Parse the message to set the new x and y positions
     }
   }
 }
 
-void stepArm() {
-  if (armSteps < rotate(90)) {
-    step(true, ARM_DIR, ARM_STEP, 100);
+void stepArm(boolean dir, double deg)
+{
+  if (armSteps < rotate(deg))
+  {
+    step(dir, ARM_DIR, ARM_STEP, 100);
     armSteps++;
-  } else {
-    delay(100);
-    armSteps = 0;
   }
 }
 
-void stepExtension() {
-  if (extensionSteps < rotate(90)) {
-    step(true, EXTENSION_DIR, EXTENSION_STEP, 100);
+void stepExtension(boolean dir, double deg)
+{
+  if (armSteps < rotate(deg))
+  {
+    step(dir, EXTENSION_DIR, EXTENSION_STEP, 100);
     extensionSteps++;
-  } else {
-    delay(100);
-    extensionSteps = 0;
+  }
+}
+
+/**
+ * return true: rotate cw, return false: rotate ccw
+ */
+boolean checkAngle(double current, double target)
+{
+  double diff = target - current;
+
+  if (0 < diff && diff < 180)
+  {
+    return false;
+  }
+  else if (-360 < diff && diff < -180)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
   }
 }
 
@@ -104,8 +130,17 @@ void setup()
 void loop()
 {
   //readSocket();
-  stepArm();
-  stepExtension();
+  if (currentArmAngle != targetArmAngle)
+  {
+    int dir = checkAngle(currentArmAngle, targetArmAngle);
+    stepArm(dir, targetArmAngle);
+  }
+
+  if (currentExtensionAngle != targetExtensionAngle)
+  {
+    int dir = checkAngle(currentExtensionAngle, targetExtensionAngle);
+    stepExtension(dir, targetExtensionAngle);
+  }
 
   lastX = posX;
   lastY = posY;

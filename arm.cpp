@@ -11,7 +11,7 @@
 /**
  * Input degrees to move the stepper
  */
-static int rotate(int deg)
+static double rotate(double deg)
 {
   return (deg / STEP_SIZE) * MICROSTEP_MODE;
 }
