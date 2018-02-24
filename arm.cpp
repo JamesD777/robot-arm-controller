@@ -8,7 +8,7 @@
 #define ARM_LENGTH 0.2794
 #define ARM_EXTENSION_LENGTH 0.2794
 
-const double ARM_GEAR_RATIO = 33.0 / 111.0;
+const double ARM_GEAR_RATIO = 111.0 / 32.0;
 const double EXTENSION_GEAR_RATIO = 10.0 / 40.0;
 
 /**

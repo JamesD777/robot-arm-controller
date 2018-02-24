@@ -35,9 +35,9 @@ double currentArmAngle = 0;
 double currentExtensionAngle = 0;
 double currentClawAngle = 0;
 
-double targetArmAngle = 0;
-double targetExtensionAngle = 0;
-double targetClawAngle = 90;
+double targetArmAngle = 45 * ARM_GEAR_RATIO;
+double targetExtensionAngle = 45 * EXTENSION_GEAR_RATIO;
+double targetClawAngle = 0;
 
 double posX, posY = 0;
 double lastX, lastY = 0;
@@ -63,28 +63,31 @@ void readSocket()
   }
 }
 
-void stepArm(boolean dir, double deg)
+void stepArm()
 {
-  if (armSteps < degreesToSteps(deg))
+  if (armSteps < degreesToSteps(targetArmAngle))
   {
+    boolean dir = checkAngle(currentArmAngle, targetArmAngle);
     step(dir, ARM_DIR, ARM_STEP, 100);
     armSteps++;
   }
 }
 
-void stepExtension(boolean dir, double deg)
+void stepExtension()
 {
-  if (armSteps < degreesToSteps(deg))
+  if (armSteps < degreesToSteps(targetExtensionAngle))
   {
+    boolean dir = checkAngle(currentExtensionAngle, targetExtensionAngle);
     step(dir, EXTENSION_DIR, EXTENSION_STEP, 100);
     extensionSteps++;
   }
 }
 
-void stepClaw(boolean dir, double deg)
+void stepClaw()
 {
-  if (clawSteps < degreesToSteps(deg))
+  if (clawSteps < degreesToSteps(targetClawAngle))
   {
+    boolean dir = checkAngle(currentClawAngle, targetClawAngle);
     step(dir, CLAW_DIR, CLAW_STEP, 100);
     clawSteps++;
   }
@@ -95,13 +98,7 @@ void stepClaw(boolean dir, double deg)
  */
 boolean checkAngle(double current, double target)
 {
-  double diff = target - current;
-
-  if (0 < diff && diff < 180)
-  {
-    return false;
-  }
-  else if (-360 < diff && diff < -180)
+  if (current < target)
   {
     return false;
   }
@@ -142,26 +139,9 @@ void setup()
 void loop()
 {
   //readSocket();
-  if (armSteps < degreesToSteps(targetArmAngle))
-  {
-    int dir = checkAngle(currentArmAngle, targetArmAngle);
-    stepArm(dir, targetArmAngle);
-    // Serial.print("current: "); Serial.println(currentArmAngle);
-    // Serial.print("target: "); Serial.println(targetArmAngle);
-    currentArmAngle = stepsToDegrees(armSteps);
-  }
-
-  // if (currentExtensionAngle != targetExtensionAngle)
-  // {
-  //   int dir = checkAngle(currentExtensionAngle, targetExtensionAngle);
-  //   stepExtension(dir, targetExtensionAngle);
-  // }
-
-  if (clawSteps < degreesToSteps(targetClawAngle))
-  {
-    int dir = checkAngle(currentClawAngle, targetClawAngle);
-    stepClaw(dir, targetClawAngle);
-  }
+  stepArm();
+  stepExtension();
+  stepClaw();
 
   lastX = posX;
   lastY = posY;
