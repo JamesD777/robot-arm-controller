@@ -21,6 +21,8 @@
 #define EXTENSION_STEP 7
 #define CLAW_STEP 9
 
+#define PULSE_WIDTH 20
+
 // Global ethernet variables
 byte mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};
 char server[] = "192.168.0.102";
@@ -30,24 +32,35 @@ int port = 8080;
 int armSteps, extensionSteps, clawSteps = 0;
 
 double posX, posY = 0;
-double lastX, lastY = 0;
 
 double currentArmAngle = 0;
 double currentExtensionAngle = 180;
 double currentClawAngle = 180;
 
-double targetArmAngle = getArmAngle(.15, 0.15);
-double targetExtensionAngle = getExtensionAngle(0.15, 0.15);
-double targetClawAngle = getClawAngle(0.15, 0.15);
+double targetArmAngle = currentArmAngle;
+double targetExtensionAngle = currentExtensionAngle;
+double targetClawAngle = currentClawAngle;
 
 // Websocket client
 EthernetClient ethernet;
 WebSocketClient client = WebSocketClient(ethernet, server, port);
 
+boolean messageSent = false;
+
 void readSocket()
 {
   if (client.connected())
   {
+
+    if (!messageSent)
+    {
+      // Send that we connected
+      client.beginMessage(TYPE_TEXT);
+      client.print("arduino");
+      client.endMessage();
+      messageSent = false;
+    }
+
     // Check if a message is available to be received
     int messageSize = client.parseMessage();
 
@@ -62,8 +75,8 @@ void readSocket()
       token = strtok(NULL, ",");
       double y = (double)atof(token);
 
-      Serial.println(x);
-      Serial.println(y);
+      posX = x;
+      posY = y;
     }
   }
 }
@@ -75,13 +88,13 @@ void stepArm()
   {
     if (targetArmAngle > currentArmAngle)
     {
-      step(false, ARM_DIR, ARM_STEP, 100);
+      step(false, ARM_DIR, ARM_STEP, PULSE_WIDTH);
       currentArmAngle += stepsToDegrees(1) / ARM_GEAR_RATIO;
       currentExtensionAngle -= stepsToDegrees(1) / (ARM_GEAR_RATIO * ARM_GEAR_RATIO);
     }
     else if (targetArmAngle < currentArmAngle)
     {
-      step(true, ARM_DIR, ARM_STEP, 100);
+      step(true, ARM_DIR, ARM_STEP, PULSE_WIDTH);
       currentArmAngle -= stepsToDegrees(1) / ARM_GEAR_RATIO;
       currentExtensionAngle += stepsToDegrees(1) / (ARM_GEAR_RATIO * ARM_GEAR_RATIO);
     }
@@ -95,13 +108,13 @@ void stepExtension()
   {
     if (targetExtensionAngle > currentExtensionAngle)
     {
-      step(false, EXTENSION_DIR, EXTENSION_STEP, 100);
+      step(false, EXTENSION_DIR, EXTENSION_STEP, PULSE_WIDTH);
       currentExtensionAngle += stepsToDegrees(1) / EXTENSION_GEAR_RATIO;
       currentClawAngle += stepsToDegrees(1) / (EXTENSION_GEAR_RATIO);
     }
     else if (targetExtensionAngle < currentExtensionAngle)
     {
-      step(true, EXTENSION_DIR, EXTENSION_STEP, 100);
+      step(true, EXTENSION_DIR, EXTENSION_STEP, PULSE_WIDTH);
       currentExtensionAngle -= stepsToDegrees(1) / EXTENSION_GEAR_RATIO;
       currentClawAngle -= stepsToDegrees(1) / (EXTENSION_GEAR_RATIO);
     }
@@ -115,12 +128,12 @@ void stepClaw()
   {
     if (targetClawAngle > currentClawAngle)
     {
-      step(false, CLAW_DIR, CLAW_STEP, 100);
+      step(false, CLAW_DIR, CLAW_STEP, PULSE_WIDTH);
       currentClawAngle += stepsToDegrees(1) / CLAW_GEAR_RATIO;
     }
     else if (targetClawAngle < currentClawAngle)
     {
-      step(true, CLAW_DIR, CLAW_STEP, 100);
+      step(true, CLAW_DIR, CLAW_STEP, PULSE_WIDTH);
       currentClawAngle -= stepsToDegrees(1) / CLAW_GEAR_RATIO;
     }
   }
@@ -181,7 +194,7 @@ void loop()
   stepExtension();
   stepClaw();
 
-  // if (count >= 1000)
+  // if (count >= PULSE_WIDTH0)
   // {
   //   delay(500);
   //   Serial.print("arm target: ");
@@ -198,6 +211,7 @@ void loop()
 
   // count++;
 
-  lastX = posX;
-  lastY = posY;
+  targetArmAngle = getArmAngle(posX, posY);
+  targetExtensionAngle = getExtensionAngle(posX, posY);
+  targetClawAngle = getClawAngle(posX, posY);
 }
