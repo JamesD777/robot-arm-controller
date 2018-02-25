@@ -33,11 +33,16 @@ static double stepsToDegrees(int steps)
 static double getArmAngle(double x, double y)
 {
 
-  double hypotenuse = sqrt(x * x + y * y);
-  double numerator =  EXTENSION_LENGTH * EXTENSION_LENGTH + hypotenuse * hypotenuse - ARM_LENGTH * ARM_LENGTH;
-  double denominator = 2 * hypotenuse * EXTENSION_LENGTH;
+  // double hypotenuse = sqrt(x * x + y * y);
+  // double numerator =  EXTENSION_LENGTH * EXTENSION_LENGTH + hypotenuse * hypotenuse - ARM_LENGTH * ARM_LENGTH;
+  // double denominator = 2 * hypotenuse * EXTENSION_LENGTH;
 
-  return (acos(numerator / denominator) + atan2(y, x)) * 180 / M_PI;
+  // return (acos(numerator / denominator) + atan2(y, x)) * 180 / M_PI;
+
+  double hypotenuse = sqrt(x * x + y * y);
+  return (atan2(EXTENSION_LENGTH, hypotenuse) + atan2(y, x)) * 180 / M_PI;
+
+
 }
 
 /**
