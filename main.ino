@@ -45,21 +45,10 @@ double targetClawAngle = currentClawAngle;
 EthernetClient ethernet;
 WebSocketClient client = WebSocketClient(ethernet, server, port);
 
-boolean messageSent = false;
-
 void readSocket()
 {
   if (client.connected())
   {
-
-    if (!messageSent)
-    {
-      // Send that we connected
-      client.beginMessage(TYPE_TEXT);
-      client.print("arduino");
-      client.endMessage();
-      messageSent = false;
-    }
 
     // Check if a message is available to be received
     int messageSize = client.parseMessage();
