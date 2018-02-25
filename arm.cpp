@@ -10,6 +10,7 @@
 
 const double ARM_GEAR_RATIO = 111.0 / 32.0;
 const double EXTENSION_GEAR_RATIO = 3.3;
+const double CLAW_GEAR_RATIO = 3.3;
 
 /**
  * Input degrees to move the stepper

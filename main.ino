@@ -23,19 +23,21 @@
 
 // Global ethernet variables
 byte mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};
-char server[] = "echo.websocket.org";
-int port = 80;
+char server[] = "192.168.0.100";
+int port = 4689;
 
 // Global position variables
 int armSteps, extensionSteps, clawSteps = 0;
 
 double currentArmAngle = 0;
 double currentExtensionAngle = 180;
-double currentClawAngle = 0;
+double currentClawAngle = 180;
 
 double targetArmAngle = 90;
-double targetExtensionAngle = currentExtensionAngle + (targetArmAngle / ARM_GEAR_RATIO);
-double targetClawAngle = 0;
+double targetExtensionAngle = 180 + (targetArmAngle / ARM_GEAR_RATIO);
+//To correct angle from first stage movement
+// targetExtensionAngle += (targetArmAngle / ARM_GEAR_RATIO);
+double targetClawAngle = 0 + (targetExtensionAngle / EXTENSION_GEAR_RATIO);
 
 double posX, posY = 0;
 double lastX, lastY = 0;
@@ -58,6 +60,14 @@ void readSocket()
 
       // Parse the message to set the new x and y positions
     }
+
+    Serial.println("sending");
+    client.beginMessage(TYPE_TEXT);
+    client.print("hello ");
+    client.endMessage();
+    delay(1000);
+  } else {
+    Serial.println("not connected");
   }
 }
 
@@ -99,11 +109,19 @@ void stepExtension()
 
 void stepClaw()
 {
-  if (clawSteps < degreesToSteps(targetClawAngle))
+  const double diff = fabs(targetClawAngle - currentClawAngle);
+  if (diff > 0.1)
   {
-    boolean dir = checkAngle(currentClawAngle, targetClawAngle);
-    step(dir, CLAW_DIR, CLAW_STEP, 100);
-    clawSteps++;
+    if (targetClawAngle > currentClawAngle)
+    {
+      step(false, CLAW_DIR, CLAW_STEP, 100);
+      currentClawAngle += stepsToDegrees(1) / CLAW_GEAR_RATIO;
+    }
+    else if (targetClawAngle < currentClawAngle)
+    {
+      step(true, CLAW_DIR, CLAW_STEP, 100);
+      currentClawAngle -= stepsToDegrees(1) / CLAW_GEAR_RATIO;
+    }
   }
 }
 
@@ -152,7 +170,7 @@ void setup()
   digitalWrite(EN, HIGH);
 
   // Start websocket client
-  // client.begin();
+  //client.begin();
 }
 int count = 0;
 void loop()
@@ -162,22 +180,22 @@ void loop()
   stepExtension();
   stepClaw();
 
-  if (count >= 1000)
-  {
-    delay(500);
-    Serial.print("arm target: ");
-    Serial.println(targetArmAngle);
-    Serial.print("extension target: ");
-    Serial.println(targetExtensionAngle);
-    Serial.print("arm current: ");
-    Serial.println(currentArmAngle);
-    Serial.print("extension current: ");
-    Serial.println(currentExtensionAngle);
-    delay(500);
-    count = 0;
-  }
+  // if (count >= 1000)
+  // {
+  //   delay(500);
+  //   Serial.print("arm target: ");
+  //   Serial.println(targetArmAngle);
+  //   Serial.print("extension target: ");
+  //   Serial.println(targetExtensionAngle);
+  //   Serial.print("arm current: ");
+  //   Serial.println(currentArmAngle);
+  //   Serial.print("extension current: ");
+  //   Serial.println(currentExtensionAngle);
+  //   delay(500);
+  //   count = 0;
+  // }
 
-  count++;
+  // count++;
 
   lastX = posX;
   lastY = posY;
