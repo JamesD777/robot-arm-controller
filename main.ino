@@ -29,16 +29,16 @@ int port = 8080;
 // Global position variables
 int armSteps, extensionSteps, clawSteps = 0;
 
+double posX, posY = 0;
+double lastX, lastY = 0;
+
 double currentArmAngle = 0;
 double currentExtensionAngle = 180;
 double currentClawAngle = 180;
 
-double targetArmAngle = getArmAngle(.15,0.15);
-double targetExtensionAngle = getExtensionAngle(0.15,0.15);
-double targetClawAngle = getClawAngle(0.15,0.15);
-
-double posX, posY = 0;
-double lastX, lastY = 0;
+double targetArmAngle = getArmAngle(.15, 0.15);
+double targetExtensionAngle = getExtensionAngle(0.15, 0.15);
+double targetClawAngle = getClawAngle(0.15, 0.15);
 
 // Websocket client
 EthernetClient ethernet;
@@ -53,9 +53,17 @@ void readSocket()
 
     if (messageSize > 0)
     {
-      char messahge[] = client.readString();
+      String message = client.readString();
 
       // Parse the message to set the new x and y positions
+      char *token = strtok(message.c_str(), ",");
+      double x = (double)atof(token);
+
+      token = strtok(NULL, ",");
+      double y = (double)atof(token);
+
+      Serial.println(x);
+      Serial.println(y);
     }
   }
 }
