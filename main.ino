@@ -77,26 +77,6 @@ void stepArm()
       currentArmAngle -= stepsToDegrees(1) / ARM_GEAR_RATIO;
     }
   }
-  //Serial.print("arm angle: "); Serial.println(currentArmAngle);
-  /*
-  if (armSteps < degreesToSteps(targetArmAngle) * ARM_GEAR_RATIO)
-  {
-    boolean dir = checkAngle(currentArmAngle, targetArmAngle);
-    step(dir, ARM_DIR, ARM_STEP, 100);
-    armSteps++;
-    if (dir)
-    {
-      currentArmAngle += stepsToDegrees(1) * ARM_GEAR_RATIO;
-    }
-    else
-    {
-      currentArmAngle -= stepsToDegrees(1) * ARM_GEAR_RATIO;
-    }
-  }
-  */
-  // else {
-  //   Serial.print("arm angle: "); Serial.println(currentArmAngle);
-  // }
 }
 
 void stepExtension()
@@ -115,28 +95,6 @@ void stepExtension()
       currentExtensionAngle -= stepsToDegrees(1) / EXTENSION_GEAR_RATIO;
     }
   }
-  //Serial.print("extension angle: "); Serial.println(currentExtensionAngle);
-  /*
-  if (extensionSteps < degreesToSteps(targetExtensionAngle) * EXTENSION_GEAR_RATIO)
-  {
-    boolean dir = checkAngle(currentExtensionAngle, targetExtensionAngle);
-    //Serial.print("Steps: "); Serial.println(extensionSteps);
-    step(dir, EXTENSION_DIR, EXTENSION_STEP, 100);
-    //Serial.print("Target: "); Serial.println(degreesToSteps(targetExtensionAngle));
-    extensionSteps++;
-    if (dir)
-    {
-      currentExtensionAngle += stepsToDegrees(1) * EXTENSION_GEAR_RATIO;
-    }
-    else
-    {
-      currentExtensionAngle -= stepsToDegrees(1) * EXTENSION_GEAR_RATIO;
-    }
-  }
-  */
-  // else {
-  //   Serial.print("extension angle: "); Serial.println(currentExtensionAngle);
-  // }
 }
 
 void stepClaw()
