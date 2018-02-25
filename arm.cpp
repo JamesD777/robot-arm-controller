@@ -40,7 +40,9 @@ static double getArmAngle(double x, double y)
   // return (acos(numerator / denominator) + atan2(y, x)) * 180 / M_PI;
 
   double hypotenuse = sqrt(x * x + y * y);
-  return (atan2(EXTENSION_LENGTH, hypotenuse) + atan2(y, x)) * 180 / M_PI;
+  double numerator = ARM_LENGTH * ARM_LENGTH + hypotenuse * hypotenuse - EXTENSION_LENGTH * EXTENSION_LENGTH;
+  double denominator = 2 * ARM_LENGTH * hypotenuse;
+  return (acos(numerator / denominator) + atan2(y, x)) * 180 / M_PI;
 
 
 }
@@ -56,6 +58,15 @@ static double getExtensionAngle(double x, double y)
   double denominator = 2 * ARM_LENGTH * EXTENSION_LENGTH;
 
   return acos(numerator / denominator) * 180 / M_PI;
+}
+
+static double getClawAngle(double x, double y)
+{
+  double hypotenuse = sqrt(x * x + y * y);
+  double numerator = EXTENSION_LENGTH * EXTENSION_LENGTH + hypotenuse * hypotenuse - ARM_LENGTH * ARM_LENGTH;
+  double denominator = 2 * hypotenuse * EXTENSION_LENGTH;
+
+  return 180 - ((-atan2(y, x) + acos(numerator / denominator)) * 180 / M_PI);
 }
 
 /**

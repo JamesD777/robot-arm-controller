@@ -23,19 +23,19 @@
 
 // Global ethernet variables
 byte mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};
-char server[] = "ws://192.168.0.102/echo";
+char server[] = "192.168.0.102";
 int port = 8080;
 
 // Global position variables
 int armSteps, extensionSteps, clawSteps = 0;
 
-double currentArmAngle = 90;
+double currentArmAngle = 0;
 double currentExtensionAngle = 180;
 double currentClawAngle = 180;
 
-double targetArmAngle = getArmAngle(0.25,0.1);
-double targetExtensionAngle = getExtensionAngle(0.25,0.1);
-double targetClawAngle = 90;
+double targetArmAngle = getArmAngle(.15,0.15);
+double targetExtensionAngle = getExtensionAngle(0.15,0.15);
+double targetClawAngle = getClawAngle(0.15,0.15);
 
 double posX, posY = 0;
 double lastX, lastY = 0;
@@ -53,19 +53,10 @@ void readSocket()
 
     if (messageSize > 0)
     {
-      Serial.println("Received a message:");
-      Serial.println(client.readString());
+      char messahge[] = client.readString();
 
       // Parse the message to set the new x and y positions
     }
-
-    Serial.println("sending");
-    client.beginMessage(TYPE_TEXT);
-    client.print("hello ");
-    client.endMessage();
-    delay(1000);
-  } else {
-    Serial.println("not connected");
   }
 }
 
@@ -172,12 +163,12 @@ void setup()
   digitalWrite(EN, HIGH);
 
   // Start websocket client
-  // client.begin();
+  client.begin();
 }
 int count = 0;
 void loop()
 {
-  // readSocket();
+  readSocket();
   stepArm();
   stepExtension();
   stepClaw();
