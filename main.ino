@@ -175,30 +175,13 @@ void setup()
   // Start websocket client
   client.begin();
 }
-int count = 0;
+
 void loop()
 {
   readSocket();
   stepArm();
   stepExtension();
   stepClaw();
-
-  // if (count >= PULSE_WIDTH0)
-  // {
-  //   delay(500);
-  //   Serial.print("arm target: ");
-  //   Serial.println(targetArmAngle);
-  //   Serial.print("extension target: ");
-  //   Serial.println(targetExtensionAngle);
-  //   Serial.print("arm current: ");
-  //   Serial.println(currentArmAngle);
-  //   Serial.print("extension current: ");
-  //   Serial.println(currentExtensionAngle);
-  //   delay(500);
-  //   count = 0;
-  // }
-
-  // count++;
 
   targetArmAngle = getArmAngle(posX, posY);
   targetExtensionAngle = getExtensionAngle(posX, posY);
