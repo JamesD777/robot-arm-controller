@@ -57,15 +57,32 @@ void readSocket()
     {
       String message = client.readString();
 
-      // Parse the message to set the new x and y positions
-      char *token = strtok(message.c_str(), ",");
-      double x = (double)atof(token);
+      if (message == "U")
+      {
+        if (fabs(currentClawAngle - targetClawAngle) < 5)
+        {
+          targetClawAngle++;
+        }
+      }
+      else if (message == "P")
+      {
+        if (fabs(currentClawAngle - targetClawAngle) < 5)
+        {
+          targetClawAngle--;
+        }
+      }
+      else
+      {
+        // Parse the message to set the new x and y positions
+        char *token = strtok(message.c_str(), ",");
+        double x = (double)atof(token);
 
-      token = strtok(NULL, ",");
-      double y = (double)atof(token);
+        token = strtok(NULL, ",");
+        double y = (double)atof(token);
 
-      posX = x;
-      posY = y;
+        posX = x;
+        posY = y;
+      }
     }
   }
 }
@@ -185,5 +202,4 @@ void loop()
 
   targetArmAngle = getArmAngle(posX, posY);
   targetExtensionAngle = getExtensionAngle(posX, posY);
-  targetClawAngle = getClawAngle(posX, posY);
 }
